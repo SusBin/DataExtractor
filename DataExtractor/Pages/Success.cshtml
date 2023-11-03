@@ -1,0 +1,15 @@
+﻿@page
+@model DataExtractor.Pages.SuccessModel
+@{
+}
+
+<div class="text-center">
+    <h1 class="display-4">Sucess!</h1>
+    <p>Your output file has generated and can be found in your default downloads location.</p>
+</div>
+
+<script>
+    window.onload = function () {
+        window.location.href = '/Success?handler=Download';
+    };
+</script>
