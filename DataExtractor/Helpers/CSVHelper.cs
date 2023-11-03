@@ -12,16 +12,27 @@ namespace DataExtractor.Helpers
     public class CSVHelper
     {
 
-        public List<string> ReadUPRNs(IFormFile file)
+        public List<string> ReadUPRNs(IFormFile file, string header)
         {
             var uprns = new List<string>();
 
             using (var reader = new StreamReader(file.OpenReadStream()))
+            using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                csvReader.Read();
+                csvReader.ReadHeader();
+                if (!csvReader.HeaderRecord.Contains(header))
                 {
-                    uprns.Add(line);
+                    throw new ArgumentException($"The specified header '{header}' does not exist in the file.");
+                }
+
+                while (csvReader.Read())
+                {
+                    var record = csvReader.GetRecord<dynamic>() as IDictionary<string, object>;
+                    if (record.ContainsKey(header))
+                    {
+                        uprns.Add(record[header].ToString());
+                    }
                 }
             }
 
@@ -29,17 +40,26 @@ namespace DataExtractor.Helpers
         }
 
 
-        public List<Dictionary<string, string>> ExtractRows(IFormFile file, List<string> uprns)
+
+        public List<Dictionary<string, string>> ExtractRows(IFormFile file, List<string> uprns, string header)
         {
             var data = new List<Dictionary<string, string>>();
+            var uprnsSet = new HashSet<string>(uprns);
 
             using (var reader = new StreamReader(file.OpenReadStream()))
             using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
+                csvReader.Read();
+                csvReader.ReadHeader();
+                if (!csvReader.HeaderRecord.Contains(header))
+                {
+                    throw new ArgumentException($"The specified header '{header}' does not exist in the file.");
+                }
+
                 while (csvReader.Read())
                 {
                     var record = csvReader.GetRecord<dynamic>() as IDictionary<string, object>;
-                    if (uprns.Contains(record["OSG_REFERENCE_NUMBER"]))
+                    if (uprnsSet.Contains(record[header]))
                     {
                         var extractedRow = new Dictionary<string, string>();
                         foreach (var key in record.Keys)
@@ -53,6 +73,7 @@ namespace DataExtractor.Helpers
 
             return data;
         }
+
 
 
         public byte[] WriteToCSV(List<Dictionary<string, string>> data)

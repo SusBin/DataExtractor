@@ -6,27 +6,92 @@
 
 <h1>File Upload</h1>
 
-<p>This tool will allow you to upload a CSV file from EPC site and pass in a another CSV file containing a list of UPRN's to extract the rows that match.</p>
+<p>This tool allows you to upload two CSV files and extract matching rows based on a specified column. This can be particularly useful when you have one CSV file with a comprehensive dataset (like an EPC site export) and another CSV file with a specific list of identifiers (like UPRNs).</p>
 
-<p>The file that contains your list of UPRN's should have a colunm header "URPN".</p>
+<p>Here's how to use this tool:</p>
 
-<p>Your first file upload should be the exported EPC CSV file. The second upload should be your list of UPRNs.</p>
+<ol>
+    <li>
+        Prepare your CSV files:
+        <ul>
+            <li>The first CSV file should be your comprehensive dataset. Note the column header that contains the identifiers you want to match.</li>
+            <li>The second CSV file should contain your list of identifiers. Again, note the column header for these identifiers.</li>
+        </ul>
+    </li>
+    <li>
+        Upload your CSV files:
+        <ul>
+            <li>Use the first upload field to upload your comprehensive dataset.</li>
+            <li>Use the second upload field to upload your list of identifiers.</li>
+        </ul>
+    </li>
+    <li>
+        Enter the column headers:
+        <ul>
+            <li>In the first text field, enter the column header from the first CSV file.</li>
+            <li>In the second text field, enter the column header from the second CSV file.</li>
+        </ul>
+    </li>
+    <li>Click the submit button. The tool will process your files and extract the matching rows.</li>
+    <li>Once your file has been processed, you will be redirected to a success page. Your output file, which contains the matching rows, will be downloaded to your default downloads location.</li>
+</ol>
 
-<p> Once you have selected your two file, click the submit button. Once your file has processed you will be redirected to a success page and your output file will be found in your default downloads location.</p>
-<form method="post" enctype="multipart/form-data">
-    
-    <div class="form-group mb-3">
-        <label asp-for="File1">Upload the EPC CSV file</label>
-        <input asp-for="File1" type="file" class="form-control">
-    </div>  
+<p>Please note that the column headers are case-sensitive, so make sure to enter them exactly as they appear in your CSV files.</p>
 
-    <div class="form-group mb-3">
-        <label asp-for="File2">Upload the CSV file with your list of UPRNs</label>
-        <input asp-for="File2" type="file" class="form-control">
+<form id="uploadForm" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="File1">Upload the comprehensive dataset</label>
+                <input id="file1" asp-for="File1" type="file" class="form-control">
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="File2">Upload your list of identifiers</label>
+                <input id="file2" asp-for="File2" type="file" class="form-control">
+            </div>
+            
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="Header1">Enter the column header for the comprehensive dataset</label>
+                <input asp-for="Header1" type="text" class="form-control">
+            </div>            
+            <div class="form-group mb-3">
+                <label asp-for="Header2">Enter the column header for the list of identifierse</label>
+                <input asp-for="Header2" type="text" class="form-control">
+            </div>
+        </div>
     </div>
     <div class="form-actions">
-        <input type="submit" value="Create" class="btn btn-primary" />        
+        <input type="submit" value="Create" class="btn btn-primary" />
     </div>
-
 </form>
+
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+        var file1 = document.getElementById('file1').files[0];
+        var file2 = document.getElementById('file2').files[0];
+
+        // Check if files are selected
+        if (!file1 || !file2) {
+            console.log('One or both files not selected.');
+            alert('Please select both files.');
+            e.preventDefault();
+            return;
+        }
+
+        // Check file size (5MB in this example)
+        var maxSize = 150 * 1024 * 1024;
+        if (file1.size > maxSize || file2.size > maxSize) {
+            console.log('File size exceeds limit. File1 size: ' + file1.size + ', File2 size: ' + file2.size);
+            alert('File size should not exceed 5MB.');
+            e.preventDefault();
+            return;
+        }
+
+        console.log('Files selected and size is within limit.');
+    });
+</script>
 
