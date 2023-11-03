@@ -14,6 +14,7 @@ namespace DataExtractor.Pages
                 System.IO.File.Delete(filePath);  // Delete the file after reading its content
                 return File(fileBytes, "text/csv", "Data.csv");
             }
+            else
 
             return NotFound();
         }

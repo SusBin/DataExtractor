@@ -38,6 +38,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapGet("/", () => Results.Redirect("/Upload"));
 app.MapRazorPages();
 app.MapControllers();
 
