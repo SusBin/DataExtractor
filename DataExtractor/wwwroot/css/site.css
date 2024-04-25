@@ -14,10 +14,82 @@ html {
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.btn-primary {
+    font-size: 1.25rem; /* Larger button text */
+    padding: 10px 20px; /* Larger button padding */
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.container {
+    max-width: 960px; /* Adjust based on your design preference */
+}
+
+.video-container {
+    max-width: 800px; /* Adjust based on your layout */
+    margin: auto;
+    padding: 20px;
+}
+
+video {
+    width: 100%; /* Responsive video */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.form-section {
+    background-color: #f8f9fa; /* Light grey background */
+    border: 1px solid #dee2e6; /* Subtle border */
+    padding: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border-radius: 5px; /* Slightly rounded corners for a softer look */
+}
+
+/* Optional: Add a shadow for more depth */
+.form-section {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Loading Spinner Styles */
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey background */
+    border-top: 8px solid #3498db; /* Blue color */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/* Center the loader on the page (or over the form) */
+.loader {
+    position: fixed; /* or 'absolute' depending on your layout */
+    left: 50%;
+    top: 50%;
+    z-index: 1000; /* Make sure it is above other content */
+    transform: translate(-50%, -50%);
+}
+
+
 #footer {
     position: relative;
     bottom: 0;

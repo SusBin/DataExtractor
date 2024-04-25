@@ -6,68 +6,110 @@
 
 <h1>File Upload</h1>
 
-<p>This tool allows you to upload two CSV files and extract matching rows based on a specified column. This can be particularly useful when you have one CSV file with a comprehensive dataset (like an EPC site export) and another CSV file with a specific list of identifiers (like UPRNs).</p>
-
-<p>Here's how to use this tool:</p>
-
-<ol>
-    <li>
-        Prepare your CSV files:
+@if (!ModelState.IsValid)
+{
+    <div class="alert alert-danger">
         <ul>
-            <li>The first CSV file should be your comprehensive dataset. Note the column header that contains the identifiers you want to match.</li>
-            <li>The second CSV file should contain your list of identifiers. Again, note the column header for these identifiers.</li>
+            @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
         </ul>
-    </li>
-    <li>
-        Upload your CSV files:
-        <ul>
-            <li>Use the first upload field to upload your comprehensive dataset.</li>
-            <li>Use the second upload field to upload your list of identifiers.</li>
-        </ul>
-    </li>
-    <li>
-        Enter the column headers:
-        <ul>
-            <li>In the first text field, enter the column header from the first CSV file.</li>
-            <li>In the second text field, enter the column header from the second CSV file.</li>
-        </ul>
-    </li>
-    <li>Click the submit button. The tool will process your files and extract the matching rows.</li>
-    <li>Once your file has been processed, you will be redirected to a success page. Your output file, which contains the matching rows, will be downloaded to your default downloads location.</li>
-</ol>
+    </div>
+}
+<div class="container">
+    <p>This tool allows you to upload two CSV files and extract matching rows based on a specified column. This can be particularly useful when you have one CSV file with a comprehensive dataset (like an EPC site export) and another CSV file with a specific list of identifiers (like UPRNs).</p>
 
-<p>Please note that the column headers are case-sensitive, so make sure to enter them exactly as they appear in your CSV files.</p>
-
-<form id="uploadForm" method="post" enctype="multipart/form-data">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group mb-3">
-                <label asp-for="File1">Upload the comprehensive dataset</label>
-                <input id="file1" asp-for="File1" type="file" class="form-control">
+    <div class="form-section">
+        <p>Please note that the column headers are case-sensitive, so make sure to enter them exactly as they appear in your CSV files.</p>
+        <form id="uploadForm" method="post" enctype="multipart/form-data" class="mt-4">
+            <div class="loader" id="loader" style="display: none;" aria-live="polite"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- File Uploads -->
+                    <div class="form-group mb-3">
+                        <label asp-for="File1">Upload the comprehensive dataset</label>
+                        <input id="file1" asp-for="File1" type="file" class="form-control" title="Maximum file size: 150MB">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="File2">Upload your list of identifiers</label>
+                        <input id="file2" asp-for="File2" type="file" class="form-control" title="Maximum file size: 150MB">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Column Headers -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Header1">Enter the column header for the comprehensive dataset</label>
+                        <input asp-for="Header1" type="text" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Header2">Enter the column header for the list of identifiers</label>
+                        <input asp-for="Header2" type="text" class="form-control">
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="File2">Upload your list of identifiers</label>
-                <input id="file2" asp-for="File2" type="file" class="form-control">
+            <div class="form-actions">
+                <input type="submit" value="Create" class="btn btn-primary btn-lg" />
             </div>
-            
+        </form>
+    </div>
+
+    <div class="accordion" id="helpAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingVideo">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVideo" aria-expanded="true" aria-controls="collapseVideo">
+                    How to Use the Tool
+                </button>
+            </h2>
+            <div id="collapseVideo" class="accordion-collapse collapse show" aria-labelledby="headingVideo" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    <div class="video-container">
+                        <video controls="controls">
+                            <source src="~/data%20extractor%20demo.mp4" type="video/mp4" />
+                        </video>
+                        <p><strong>Note:</strong> This video demonstrates how to upload files and use the data extraction tool.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="col-md-6">
-            <div class="form-group mb-3">
-                <label asp-for="Header1">Enter the column header for the comprehensive dataset</label>
-                <input asp-for="Header1" type="text" class="form-control">
-            </div>            
-            <div class="form-group mb-3">
-                <label asp-for="Header2">Enter the column header for the list of identifiers</label>
-                <input asp-for="Header2" type="text" class="form-control">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingInstructions">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInstructions" aria-expanded="false" aria-controls="collapseInstructions">
+                    Detailed Instructions
+                </button>
+            </h2>
+            <div id="collapseInstructions" class="accordion-collapse collapse" aria-labelledby="headingInstructions" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    <ol>
+                        <li>
+                            Prepare your CSV files:
+                            <ul>
+                                <li>The first CSV file should be your comprehensive dataset. Note the column header that contains the identifiers you want to match.</li>
+                                <li>The second CSV file should contain your list of identifiers. Again, note the column header for these identifiers.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Upload your CSV files:
+                            <ul>
+                                <li>Use the first upload field to upload your comprehensive dataset.</li>
+                                <li>Use the second upload field to upload your list of identifiers.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Enter the column headers:
+                            <ul>
+                                <li>In the first text field, enter the column header from the first CSV file.</li>
+                                <li>In the second text field, enter the column header from the second CSV file.</li>
+                            </ul>
+                        </li>
+                        <li>Click the submit button. The tool will process your files and extract the matching rows.</li>
+                        <li>Once your file has been processed, you will be redirected to a success page. Your output file, which contains the matching rows, will be downloaded to your default downloads location.</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
-    <div class="form-actions">
-        <input type="submit" value="Create" class="btn btn-primary" />
-    </div>
-</form>
-
+</div>
 
 <script>
     document.getElementById('uploadForm').addEventListener('submit', function (e) {
@@ -82,16 +124,19 @@
             return;
         }
 
-        // Check file size (5MB in this example)
+        // Check file size (150MB in this example)
         var maxSize = 150 * 1024 * 1024;
         if (file1.size > maxSize || file2.size > maxSize) {
             console.log('File size exceeds limit. File1 size: ' + file1.size + ', File2 size: ' + file2.size);
-            alert('File size should not exceed 5MB.');
+            alert('File size should not exceed 150MB.');
             e.preventDefault();
             return;
         }
 
         console.log('Files selected and size is within limit.');
-    });
+
+        // Show the loader
+        document.getElementById('loader').style.display = 'block';
+    });    
 </script>
 

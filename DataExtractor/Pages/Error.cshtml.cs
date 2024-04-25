@@ -8,7 +8,8 @@ namespace DataExtractor.Pages
     [IgnoreAntiforgeryToken]
     public class ErrorModel : PageModel
     {
-        public string ErrorMessage { get; set; }
+        [TempData]
+        public string ErrorMessage { get; set; } = "An unexpected error has occurred.";
 
         public string RequestId { get; set; }
 
@@ -17,8 +18,6 @@ namespace DataExtractor.Pages
         public void OnGet()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-
-            ErrorMessage = TempData["ErrorMessage"] as string;
         }
 
     }

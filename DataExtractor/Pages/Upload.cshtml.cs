@@ -27,43 +27,40 @@ namespace DataExtractor.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            // Check for file upload errors
+            if (File1 == null || File2 == null)
             {
-                if (File1 == null || File2 == null)
-                {
-                    TempData["ErrorMessage"] = "Both files must be uploaded.";
-                    return RedirectToPage("/Error");
-                }
-                // Check if column headers are provided
-                if (string.IsNullOrEmpty(Header1) || string.IsNullOrEmpty(Header2))
-                {
-                    TempData["ErrorMessage"] = "Column header is missing. Please enter a column header.";
-                    return RedirectToPage("/Error");
-                }
-
+                ModelState.AddModelError("", "Both CSV files must be uploaded.");
                 return Page();
             }
-            // Check if files are empty
             if (File1.Length == 0 || File2.Length == 0)
             {
-                TempData["ErrorMessage"] = "File is empty. Please upload a non-empty file.";
-                return RedirectToPage("/Error");
+                ModelState.AddModelError("", "Both files must not be empty.");
+                return Page();
             }
-            // Check if files are CSV
-            if (Path.GetExtension(File1.FileName).ToLower() != ".csv" || Path.GetExtension(File2.FileName).ToLower() != ".csv")
+            if (Path.GetExtension(File1.FileName).ToLower() != ".csv"
+                || Path.GetExtension(File2.FileName).ToLower() != ".csv")
             {
-                TempData["ErrorMessage"] = "Invalid file format. Please upload a CSV file.";
-                return RedirectToPage("/Error");
+                ModelState.AddModelError("", "Please upload CSV files only.");
+                return Page();
             }
-            
 
+            // Check for header errors
+            if (string.IsNullOrEmpty(Header1) || string.IsNullOrEmpty(Header2))
+            {
+                ModelState.AddModelError("", "Column headers must not be empty.");
+                return Page();
+            }
+
+            // Process files
             try
             {
                 var uprns = _csvHelper.ReadUPRNs(File2, Header2);
                 var data = _csvHelper.ExtractRows(File1, uprns, Header1);
                 var csvData = _csvHelper.WriteToCSV(data);
 
-                //return File(csvData, "text/csv", "Data.csv");
+                // Consider streaming the file directly to avoid saving it to disk
+                //return File(csvData, "text/csv", "ExtractedData.csv");
 
                 // Specify a unique file path
                 string filePath = Path.Combine("temp", Guid.NewGuid().ToString() + ".csv");
@@ -79,10 +76,21 @@ namespace DataExtractor.Pages
 
                 // Redirect to the success page
                 return RedirectToPage("/Success");
-            } catch (Exception ex)
+            }
+            catch (ArgumentException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                return RedirectToPage("/Error");
+                // If the exception is due to a missing header, inform the user which header is missing.
+                ModelState.AddModelError("", ex.Message);
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details here for further investigation
+                // Logger.LogError(ex, "An error occurred while processing the files");
+
+                // Add a generic error message or specific ones based on exception types if identifiable
+                ModelState.AddModelError("", "An unexpected error occurred. Please try again.");
+                return Page();
             }
         }
 

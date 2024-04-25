@@ -15,8 +15,9 @@ namespace DataExtractor.Pages
                 return File(fileBytes, "text/csv", "Data.csv");
             }
             else
-
-            return NotFound();
+            {
+                return NotFound();
+            }
         }
     }
 }

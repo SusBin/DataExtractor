@@ -4,14 +4,31 @@
     ViewData["Title"] = "Error";
 }
 
+<h1>Oops!</h1>
+<h2>An error occurred while processing your request.</h2>
 
-<h1>Error</h1>
+<!-- Display the user-friendly error message -->
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
 
-<p>An error occurred: @Model.ErrorMessage</p>
+<!-- Provide options for the user to navigate away from the error page -->
+<div class="mt-4">
+    <a href="/" class="btn btn-primary">Return to Home</a>
+    <a href="javascript:history.back()" class="btn btn-secondary">Try Again</a>
+</div>
 
 @if (Model.ShowRequestId)
 {
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
+    <div class="text-muted small">
+        <p>
+            If you continue to encounter this error, please contact support with the Request ID below.
+        </p>
+        <p>
+            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
+    </div>
 }
