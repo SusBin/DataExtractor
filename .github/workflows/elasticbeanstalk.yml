@@ -1,0 +1,42 @@
+name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - master 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0'
+
+    - name: Build with dotnet
+      run: dotnet build DataExtractor.sln --configuration Release
+
+    - name: Dotnet publish
+      run: dotnet publish DataExtractor.sln -c Release -o published
+
+    - name: Zip the published app
+      run: zip -r published.zip published/
+
+    - name: Get version label
+      id: version-label
+      run: echo ::set-output name=version::$(date +%Y%m%d%H%M%S)
+
+    - name: Deploy to Elastic Beanstalk
+      uses: einaregilsson/beanstalk-deploy@v18
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: us-east-1  # Change to your AWS region
+        application_name: DataExtractor
+        environment_name: DataExtractor-env-1
+        version_label: ${{ steps.version-label.outputs.version }}
+        deployment_package: published.zip
